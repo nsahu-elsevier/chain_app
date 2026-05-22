@@ -1,0 +1,214 @@
+/* Accessibility Issues CSS - This file contains intentional accessibility problems for testing */
+
+/* Issue 1: Removed focus indicators */
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+a:focus, button:focus, input:focus, textarea:focus, select:focus {
+  outline: none !important;
+}
+
+/* Issue 2: Hover-only menu items */
+.hover-only-menu {
+  position: relative;
+}
+
+.hover-only-menu .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.hover-only-menu:hover .dropdown-content {
+  display: block;
+}
+
+/* Issue 3: Very low contrast text */
+.low-contrast-text {
+  color: #aaaaaa;
+  background-color: #bbbbbb;
+}
+
+.low-contrast-warning {
+  color: #ffcc00;
+  background-color: #ffffff;
+}
+
+/* Issue 4: Small touch targets */
+.tiny-button {
+  padding: 2px 4px;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+/* Issue 5: Text in images */
+.text-as-image {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Important Text</text></svg>');
+  width: 200px;
+  height: 50px;
+}
+
+/* Issue 6: Insufficient color contrast on buttons */
+.bad-contrast-btn {
+  background-color: #FFA500;
+  color: #FFFF00;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+/* Issue 7: Disabled elements that don't look disabled */
+input:disabled, button:disabled {
+  opacity: 0.95;
+  cursor: pointer;
+}
+
+/* Issue 8: Hidden content that's important */
+.visually-hidden-important {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Issue 9: Animations without prefers-reduced-motion respect */
+@keyframes constant-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.always-spinning {
+  animation: constant-spin 2s linear infinite;
+}
+
+/* Issue 10: Fixed positioning that covers content */
+.fixed-overlay {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 200px;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+}
+
+/* Issue 11: Justified text that's hard to read */
+.justified-text {
+  text-align: justify;
+  hyphens: none;
+}
+
+/* Issue 12: All caps text */
+.all-caps-text {
+  text-transform: uppercase;
+  letter-spacing: 0px;
+}
+
+/* Issue 13: Underlined text that's not a link */
+.fake-link {
+  text-decoration: underline;
+  color: blue;
+  cursor: default;
+}
+
+/* Issue 14: Links that don't look like links */
+a.no-link-style {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.no-link-style:hover {
+  color: inherit;
+}
+
+/* Issue 15: Form elements without visible labels */
+input[type="text"].no-label,
+input[type="email"].no-label {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+/* Issue 16: Horizontal scrolling content */
+.horizontal-scroll-trap {
+  overflow-x: scroll;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* Issue 17: Emoji as functional buttons */
+.emoji-button {
+  font-size: 32px;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Issue 18: Placeholder text as labels */
+input[placeholder]:not([aria-label]):not([aria-labelledby]) {
+  /* Placeholder is the only label */
+}
+
+/* Issue 19: Auto-updating content without notice */
+.auto-update-content {
+  /* Content updates without ARIA live regions */
+}
+
+/* Issue 20: Modal dialogs without proper focus management */
+.modal-no-trap {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  z-index: 1000;
+}
+
+/* Issue 21: Infinite scrolling without pagination alternative */
+.infinite-scroll-only {
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+/* Issue 22: Icon-only buttons without labels */
+.icon-only-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Issue 23: Custom scrollbars that are too thin */
+::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+}
+
+/* Issue 24: Timeout without extension option */
+.session-timeout-warning {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #ff0000;
+  color: white;
+  padding: 10px;
+}
+
+/* Issue 25: Drag and drop only interface */
+.drag-drop-only {
+  border: 2px dashed #ccc;
+  padding: 40px;
+  text-align: center;
+  cursor: move;
+}
