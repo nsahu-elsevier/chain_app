@@ -1,0 +1,120 @@
+name: Accessibility Check (WCAG 2.1 AA)
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  accessibility:
+    name: WCAG 2.1 AA Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Serve build output
+        run: npx serve@latest -s dist -l 4173 &
+
+      - name: Wait for server
+        run: npx wait-on@latest http://localhost:4173 --timeout 30000
+
+      - name: Install axe CLI
+        run: npm install -g @axe-core/cli
+
+      - name: Run WCAG 2.1 AA accessibility scan
+        run: |
+          axe http://localhost:4173 \
+            --tags wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa \
+            --reporter json \
+            --save axe-results.json || true
+
+      - name: Post PR comment with results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = '## :wheelchair: Accessibility Scan Results (WCAG 2.1 AA)
+
+';
+            try {
+              const data = JSON.parse(fs.readFileSync('axe-results.json', 'utf8'));
+              const violations = data[0]?.violations ?? [];
+              const passes     = data[0]?.passes     ?? [];
+              const incomplete = data[0]?.incomplete ?? [];
+              const critical = violations.filter(v => v.impact === 'critical' || v.impact === 'serious');
+              const moderate = violations.filter(v => v.impact === 'moderate');
+              const minor    = violations.filter(v => v.impact === 'minor');
+              const total = violations.length + passes.length;
+              const score = total === 0 ? 100 : Math.round((passes.length / total) * 100);
+              const icon  = critical.length > 0 ? ':x:' : violations.length > 0 ? ':warning:' : ':white_check_mark:';
+              body += icon + ' **Score: ' + score + '/100**
+
+';
+              body += '| Severity | Count |
+|----------|---------|
+';
+              body += '| :red_circle: Critical / Serious | ' + critical.length + ' |
+';
+              body += '| :yellow_circle: Moderate | ' + moderate.length + ' |
+';
+              body += '| :blue_circle: Minor | ' + minor.length + ' |
+';
+              body += '| :white_check_mark: Passed rules | ' + passes.length + ' |
+';
+              body += '| :warning: Needs review | ' + incomplete.length + ' |
+
+';
+              if (violations.length === 0) {
+                body += ':tada: No accessibility violations found!
+';
+              } else {
+                body += '### Violations
+
+';
+                for (const v of violations.slice(0, 15)) {
+                  const ic = v.impact === 'critical' || v.impact === 'serious' ? ':red_circle:' : v.impact === 'moderate' ? ':yellow_circle:' : ':blue_circle:';
+                  const wcag = v.tags.filter(t => /^wcag/.test(t)).join(', ');
+                  body += '**' + ic + ' ' + v.help + '** (' + v.id + ')
+';
+                  body += '> ' + v.description + '
+
+';
+                  if (wcag) body += '**WCAG:** ' + wcag + '
+
+';
+                  body += '**Affected elements:** ' + v.nodes.length + '
+
+';
+                }
+                if (violations.length > 15) body += '...and ' + (violations.length - 15) + ' more violations
+';
+              }
+            } catch (e) {
+              body += ':warning: Could not parse scan results.
+';
+            }
+            body += '
+---
+_Scanned by Accessibility Pilot - axe-core WCAG 2.1 AA_';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
