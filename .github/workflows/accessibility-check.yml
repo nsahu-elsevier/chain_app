@@ -49,9 +49,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let body = '## :wheelchair: Accessibility Scan Results (WCAG 2.1 AA)
-
-';
+            let body = '## :wheelchair: Accessibility Scan Results (WCAG 2.1 AA)\n\n';
             try {
               const data = JSON.parse(fs.readFileSync('axe-results.json', 'utf8'));
               const violations = data[0]?.violations ?? [];
@@ -63,55 +61,31 @@ jobs:
               const total = violations.length + passes.length;
               const score = total === 0 ? 100 : Math.round((passes.length / total) * 100);
               const icon  = critical.length > 0 ? ':x:' : violations.length > 0 ? ':warning:' : ':white_check_mark:';
-              body += icon + ' **Score: ' + score + '/100**
-
-';
-              body += '| Severity | Count |
-|----------|---------|
-';
-              body += '| :red_circle: Critical / Serious | ' + critical.length + ' |
-';
-              body += '| :yellow_circle: Moderate | ' + moderate.length + ' |
-';
-              body += '| :blue_circle: Minor | ' + minor.length + ' |
-';
-              body += '| :white_check_mark: Passed rules | ' + passes.length + ' |
-';
-              body += '| :warning: Needs review | ' + incomplete.length + ' |
-
-';
+              body += icon + ' **Score: ' + score + '/100**\n\n';
+              body += '| Severity | Count |\n|----------|---------|\n';
+              body += '| :red_circle: Critical / Serious | ' + critical.length + ' |\n';
+              body += '| :yellow_circle: Moderate | ' + moderate.length + ' |\n';
+              body += '| :blue_circle: Minor | ' + minor.length + ' |\n';
+              body += '| :white_check_mark: Passed rules | ' + passes.length + ' |\n';
+              body += '| :warning: Needs review | ' + incomplete.length + ' |\n\n';
               if (violations.length === 0) {
-                body += ':tada: No accessibility violations found!
-';
+                body += ':tada: No accessibility violations found!\n';
               } else {
-                body += '### Violations
-
-';
+                body += '### Violations\n\n';
                 for (const v of violations.slice(0, 15)) {
                   const ic = v.impact === 'critical' || v.impact === 'serious' ? ':red_circle:' : v.impact === 'moderate' ? ':yellow_circle:' : ':blue_circle:';
                   const wcag = v.tags.filter(t => /^wcag/.test(t)).join(', ');
-                  body += '**' + ic + ' ' + v.help + '** (' + v.id + ')
-';
-                  body += '> ' + v.description + '
-
-';
-                  if (wcag) body += '**WCAG:** ' + wcag + '
-
-';
-                  body += '**Affected elements:** ' + v.nodes.length + '
-
-';
+                  body += '**' + ic + ' ' + v.help + '** (' + v.id + ')\n';
+                  body += '> ' + v.description + '\n\n';
+                  if (wcag) body += '**WCAG:** ' + wcag + '\n\n';
+                  body += '**Affected elements:** ' + v.nodes.length + '\n\n';
                 }
-                if (violations.length > 15) body += '...and ' + (violations.length - 15) + ' more violations
-';
+                if (violations.length > 15) body += '...and ' + (violations.length - 15) + ' more violations\n';
               }
             } catch (e) {
-              body += ':warning: Could not parse scan results.
-';
+              body += ':warning: Could not parse scan results.\n';
             }
-            body += '
----
-_Scanned by Accessibility Pilot - axe-core WCAG 2.1 AA_';
+            body += '\n---\n_Scanned by Accessibility Pilot - axe-core WCAG 2.1 AA_';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo:  context.repo.repo,
