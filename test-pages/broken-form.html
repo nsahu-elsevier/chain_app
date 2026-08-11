@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Contact Us</title>
+<style>
+  body { background: #ffffff; color: #cccccc; font-family: Arial; }
+  .btn { background: #eeeeee; color: #f0f0f0; padding: 8px; }
+  a { color: #dddddd; text-decoration: none; }
+  .icon-link { display: inline-block; width: 20px; height: 20px; background: url('icon.png'); }
+</style>
+</head>
+<body>
+
+<div class="logo"><img src="assets/images/logo.png"></div>
+
+<div onclick="submitForm()">Submit</div>
+
+<h1>Contact Us</h1>
+<h3>Please fill out the form below</h3>
+
+<form>
+  <input type="text" placeholder="Name">
+  <input type="email" placeholder="Email">
+  <textarea placeholder="Message"></textarea>
+  <input type="checkbox"> Subscribe to newsletter
+  <button class="btn">Send</button>
+</form>
+
+<p>Click <a href="#">here</a> to view our privacy policy.</p>
+<a href="page2.html" class="icon-link"></a>
+
+<div style="color: red;">* Required fields are marked in red</div>
+
+<video autoplay loop>
+  <source src="promo.mp4" type="video/mp4">
+</video>
+
+<table>
+  <tr><td>Name</td><td>Email</td><td>Status</td></tr>
+  <tr><td>Jane Doe</td><td>jane@example.com</td><td>Active</td></tr>
+</table>
+
+</body>
+</html>
